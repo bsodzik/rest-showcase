@@ -73,4 +73,15 @@ public class Book {
 	public int hashCode() {
 		return isbn != null ? isbn.hashCode() : 0;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("Book[");
+		sb.append("isbn=").append(isbn);
+		sb.append(", title=").append(title);
+		sb.append(", description=").append(description);
+		sb.append(", authors=").append(authors);
+		sb.append(']');
+		return sb.toString();
+	}
 }
