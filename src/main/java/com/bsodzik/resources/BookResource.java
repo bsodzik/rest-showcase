@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
@@ -38,14 +39,15 @@ public class BookResource {
 	@GET
 	@Produces({"application/json", "application/xml"})
 	public Response find(@QueryParam("title") String title, @QueryParam("author") String author, @Context Request request) {
-		List<Book> books = searcher.search(title, author);
+		final List<Book> books = searcher.search(title, author);
 
 		EntityTag eTag = calculateETag(books);
 		Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(eTag);
 		if (responseBuilder != null) {
 			return responseBuilder.build();
 		}
-		return Response.ok(books).tag(eTag).build();
+		// Conversion to GenericEntity is required for XML when using ResponseBuilder..
+		return Response.ok(toGenericEntity(books)).tag(eTag).build();
 	}
 
 	@GET
@@ -101,5 +103,10 @@ public class BookResource {
 
 	private EntityTag calculateETag(List<Book> books) {
 		return new EntityTag(DigestUtils.md5DigestAsHex(books.toString().getBytes()));
+	}
+
+	private GenericEntity<List<Book>> toGenericEntity(final List<Book> books) {
+		return new GenericEntity<List<Book>>(books) {
+		};
 	}
 }
