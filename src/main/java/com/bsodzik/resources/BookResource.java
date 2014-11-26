@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -38,10 +39,11 @@ public class BookResource {
 
 	@GET
 	@Produces({"application/json", "application/xml"})
-	public Response find(@QueryParam("title") String title, @QueryParam("author") String author, @Context Request request) {
+	public Response find(@QueryParam("title") String title, @QueryParam("author") String author,
+						 @HeaderParam("Accept") String accept, @Context Request request) {
 		final List<Book> books = searcher.search(title, author);
 
-		EntityTag eTag = calculateETag(books);
+		EntityTag eTag = calculateETag(books, accept);
 		Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(eTag);
 		if (responseBuilder != null) {
 			return responseBuilder.build();
@@ -101,8 +103,9 @@ public class BookResource {
 		return book;
 	}
 
-	private EntityTag calculateETag(List<Book> books) {
-		return new EntityTag(DigestUtils.md5DigestAsHex(books.toString().getBytes()));
+	private EntityTag calculateETag(List<Book> books, String accept) {
+		String value = accept + books;
+		return new EntityTag(DigestUtils.md5DigestAsHex(value.getBytes()));
 	}
 
 	private GenericEntity<List<Book>> toGenericEntity(final List<Book> books) {
