@@ -11,6 +11,6 @@ public class BookExceptionMapper implements ExceptionMapper<BookException> {
 
 	@Override
 	public Response toResponse(BookException e) {
-		return Response.status(Response.Status.NOT_FOUND).entity(String.format(e.getMessage(), e.getIsbn())).build();
+		return Response.status(e.getResponseStatus()).entity(String.format(e.getMessage(), e.getIsbn())).build();
 	}
 }

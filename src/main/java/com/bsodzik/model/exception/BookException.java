@@ -1,6 +1,8 @@
 package com.bsodzik.model.exception;
 
-public class BookException extends RuntimeException {
+import javax.ws.rs.core.Response;
+
+public abstract class BookException extends RuntimeException {
 
 	private String isbn;
 
@@ -12,4 +14,6 @@ public class BookException extends RuntimeException {
 	public String getIsbn() {
 		return isbn;
 	}
+
+	public abstract Response.Status getResponseStatus();
 }
